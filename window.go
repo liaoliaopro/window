@@ -13,11 +13,10 @@ package window
 // multiple of the intended capacity of the queue
 // so that copying is less frequent.
 type MovingWindow struct {
-	arr      []float64
-	size     int
-	head     int
-	tail     int
-	capacity int64
+	arr  []float64
+	size int
+	head int
+	tail int
 }
 
 // PushBack will push a new piece of data into
