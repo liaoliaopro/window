@@ -13,38 +13,39 @@ package window
 // multiple of the intended capacity of the queue
 // so that copying is less frequent.
 type MovingWindow struct {
-    arr  []float64
-    size int
-    head int
-    tail int
+	arr      []float64
+	size     int
+	head     int
+	tail     int
+	capacity int64
 }
 
 // PushBack will push a new piece of data into
 // the moving window
 func (m *MovingWindow) PushBack(v float64) {
-    // if the array is full, rewind
-    if m.tail == len(m.arr) {
-        m.rewind()
-    }
-    // push the value
-    m.arr[m.tail] = v
-    // check if the window is full,
-    // and move head pointer appropriately
-    if m.tail-m.head >= m.size {
-        m.head++
-    }
-    m.tail++
+	// if the array is full, rewind
+	if m.tail == len(m.arr) {
+		m.rewind()
+	}
+	// push the value
+	m.arr[m.tail] = v
+	// check if the window is full,
+	// and move head pointer appropriately
+	if m.tail-m.head >= m.size {
+		m.head++
+	}
+	m.tail++
 }
 
 // rewind will copy the last size-1 elements
 // from the end of the underlying array to
 // the front, starting at index 0.
 func (m *MovingWindow) rewind() {
-    l := len(m.arr)
-    for i := 0; i < m.size-1; i++ {
-        m.arr[i] = m.arr[l-m.size+i+1]
-    }
-    m.head, m.tail = 0, m.size-1
+	l := len(m.arr)
+	for i := 0; i < m.size-1; i++ {
+		m.arr[i] = m.arr[l-m.size+i+1]
+	}
+	m.head, m.tail = 0, m.size-1
 }
 
 // Slice will present the MovingWindow in
@@ -56,13 +57,24 @@ func (m *MovingWindow) rewind() {
 // you wish to save the reference, you should
 // make a copy.
 func (m *MovingWindow) Slice() []float64 {
-    return m.arr[m.head:m.tail]
+	return m.arr[m.head:m.tail]
 }
 
 // Size returns the size of the moving window,
 // which is set at initialization
 func (m *MovingWindow) Size() int {
-    return m.size
+	return m.size
+}
+
+// Len returns the length of the moving window,
+// which means how many items are there in window currently.
+func (m *MovingWindow) Len() int {
+	return m.tail - m.head
+}
+
+// Capacity return the capacity of underlying array.
+func (m *MovingWindow) Capacity() int {
+	return cap(m.arr)
 }
 
 // New creates a new moving window,
@@ -75,12 +87,12 @@ func (m *MovingWindow) Size() int {
 // array copying is proportional to approx 1/M,
 // where M is the multiple.
 func New(size, multiple int) *MovingWindow {
-    if size < 1 || multiple < 1{
-        panic("Must have positive size and multiple")
-    }
-    capacity := size*multiple
-    return &MovingWindow{
-        arr:  make([]float64, capacity, capacity),
-        size: size,
-    }
+	if size < 1 || multiple < 1 {
+		panic("Must have positive size and multiple")
+	}
+	capacity := size * multiple
+	return &MovingWindow{
+		arr:  make([]float64, capacity, capacity),
+		size: size,
+	}
 }
